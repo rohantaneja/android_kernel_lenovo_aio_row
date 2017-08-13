@@ -12,7 +12,10 @@
 #include <linux/list.h>
 #include <uapi/linux/input.h>
 /* Implementation details, userspace should not care about these */
-#define ABS_MT_FIRST		ABS_MT_TOUCH_MAJOR
+//lenovo liuyw2
+#define ABS_MT_FIRST ABS_MT_POSITION_X_W
+//#define ABS_MT_FIRST		ABS_MT_TOUCH_MAJOR
+//#define ABS_MT_LAST ABS_MT_POSITION_Y_W
 #define ABS_MT_LAST		ABS_MT_TOOL_Y
 
 /*

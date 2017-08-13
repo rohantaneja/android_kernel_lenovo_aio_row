@@ -116,9 +116,15 @@ static ssize_t led_delay_off_store(struct device *dev,
 
 	return size;
 }
-
+//lenovo wuwl10 20150514 modify for led begin
+#if 1 
+static DEVICE_ATTR(delay_on, 0777, led_delay_on_show, led_delay_on_store);
+static DEVICE_ATTR(delay_off, 0777, led_delay_off_show, led_delay_off_store);
+#else
 static DEVICE_ATTR(delay_on, 0644, led_delay_on_show, led_delay_on_store);
 static DEVICE_ATTR(delay_off, 0644, led_delay_off_show, led_delay_off_store);
+#endif
+//lenovo wuwl10 20150514 modify for led end
 static DEVICE_ATTR(invert, 0644, led_invert_show, led_invert_store);
 static DEVICE_ATTR(shot, 0200, NULL, led_shot);
 
