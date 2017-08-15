@@ -152,9 +152,7 @@ static struct console *exclusive_console;
 /*
  *	Array of consoles built from command line options (console=)
  */
-
-struct console_cmdline
-{
+struct console_cmdline {
 	char	name[16];			/* Name of the driver	    */
 	int	index;				/* Minor dev. to use	    */
 	char	*options;			/* Options for the driver   */
@@ -2248,7 +2246,14 @@ void console_unlock(void)
 	unsigned long flags;
 	bool wake_klogd = false;
 	bool do_cond_resched, retry;
-
+#if defined(CONFIG_MT_ENG_BUILD) && defined(CONFIG_LOG_TOO_MUCH_WARNING)
+	unsigned long long t1 = 0;
+	char aee_str[512];
+	int org_loglevel = console_loglevel;
+	static u64 time_count;
+	static int line_count, size_count;
+	int ret = 0;
+#endif
 	if (console_suspended) {
 		up(&console_sem);
 		return;

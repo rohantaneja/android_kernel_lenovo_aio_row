@@ -3279,6 +3279,7 @@ static void addrconf_rs_timer(unsigned long data)
 				      idev->cnf.rtr_solicit_delay :
 				      idev->cnf.rtr_solicit_interval);
 	} else {
+		inet6_no_ra_notify(RTM_NORA,idev);
 		/*
 		 * Note: we do not support deprecated "all on-link"
 		 * assumption any longer.
