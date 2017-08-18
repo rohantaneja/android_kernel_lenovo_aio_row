@@ -79,17 +79,17 @@ typedef enum {
 	PREPARE_PRESENT_FENCE
 } ePREPARE_FENCE_TYPE;
 
+#ifdef CONFIG_MTK_VIDEOX_CYNGN_LIVEDISPLAY
+static struct mtk_rgb_work_queue {
+	struct work_struct work;
+	struct mutex lock;
+} mtk_rgb_work_queue;
+#endif
+
 /*extern disp_sync_info *_get_sync_info(unsigned int session_id, unsigned int timeline_id);*/
 static dev_t mtk_disp_mgr_devno;
 static struct cdev *mtk_disp_mgr_cdev;
 static struct class *mtk_disp_mgr_class;
-
-#ifdef CONFIG_MTK_VIDEOX_CYNGN_LIVEDISPLAY
-static struct mtk_rgb_work_queue {
-        struct work_struct work;
-	struct mutex lock;
-} mtk_rgb_work_queue;
-#endif
 
 static int mtk_disp_mgr_open(struct inode *inode, struct file *file)
 {
@@ -1920,7 +1920,6 @@ long mtk_disp_mgr_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	case DISP_IOCTL_PQ_SET_BYPASS_COLOR:
 	case DISP_IOCTL_PQ_SET_WINDOW:
 	case DISP_IOCTL_OD_CTL:
-	case DISP_IOCTL_WRITE_REG:
 	case DISP_IOCTL_READ_REG:
 	case DISP_IOCTL_MUTEX_CONTROL:
 	case DISP_IOCTL_PQ_GET_TDSHP_FLAG:
@@ -2110,7 +2109,7 @@ static ssize_t mtk_disp_ld_set_rgb(struct device *dev,
 static DEVICE_ATTR(rgb, S_IRUGO | S_IWUSR | S_IWGRP, mtk_disp_ld_get_rgb, mtk_disp_ld_set_rgb);
 
 static void mtk_disp_rgb_work(struct work_struct *work) {
-        struct mtk_rgb_work_queue *rgb_wq = container_of(work, struct mtk_rgb_work_queue, work);
+	struct mtk_rgb_work_queue *rgb_wq = container_of(work, struct mtk_rgb_work_queue, work);
 	int r = mtk_disp_ld_r, g = mtk_disp_ld_g, b = mtk_disp_ld_b;
 	int i, gammutR, gammutG, gammutB, ret;
 	DISP_GAMMA_LUT_T *gamma;
@@ -2127,6 +2126,7 @@ static void mtk_disp_rgb_work(struct work_struct *work) {
 		gamma->lut[i] = GAMMA_ENTRY(gammutR, gammutG, gammutB);
 	}
 
+	pr_info("Set gamma: %d %d %d\n", r, g, b);
 	ret = primary_display_user_cmd(DISP_IOCTL_SET_GAMMALUT, (unsigned long)gamma);
 
 	kfree(gamma);
@@ -2136,7 +2136,7 @@ static void mtk_disp_rgb_work(struct work_struct *work) {
 
 static int __init mtk_disp_mgr_init(void)
 {
-    	int rc = 0;
+	int rc = 0;
 
 	if (platform_device_register(&mtk_disp_mgr_device))
 		return -ENODEV;
@@ -2146,10 +2146,11 @@ static int __init mtk_disp_mgr_init(void)
 		return -ENODEV;
 	}
 
+
 #ifdef CONFIG_MTK_VIDEOX_CYNGN_LIVEDISPLAY
-    	rc = sysfs_create_file(&(mtk_disp_mgr_device.dev.kobj), &dev_attr_rgb.attr);
-    	mutex_init(&mtk_rgb_work_queue.lock);
-    	INIT_WORK(&mtk_rgb_work_queue.work, mtk_disp_rgb_work);
+	rc = sysfs_create_file(&(mtk_disp_mgr_device.dev.kobj), &dev_attr_rgb.attr);
+	mutex_init(&mtk_rgb_work_queue.lock);
+	INIT_WORK(&mtk_rgb_work_queue.work, mtk_disp_rgb_work);
 #endif
 
 	return rc;

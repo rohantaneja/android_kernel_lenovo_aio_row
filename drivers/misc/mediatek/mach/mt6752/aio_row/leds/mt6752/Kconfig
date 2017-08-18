@@ -1,0 +1,5 @@
+config MTK_CUST_LEDS
+	tristate "LED Notification"
+        default n
+	help
+	  Say Y here to get LED notications other than VIBE based ROMs.

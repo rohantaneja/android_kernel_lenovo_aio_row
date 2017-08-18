@@ -3,3 +3,4 @@ config MTK_VIDEO
   default n
   help
     CONFIG_MTK_VIDEO
+

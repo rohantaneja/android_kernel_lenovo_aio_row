@@ -104,23 +104,19 @@ unsigned int brightness_mapping(unsigned int level)
  *-------------------------------------------------------------------------------------------
  */
 static struct cust_mt65xx_led cust_led_list[MT65XX_LED_TYPE_TOTAL] = {
-// a custom LED addition for notification begin here
 	{"red",               MT65XX_LED_MODE_PMIC, MT65XX_LED_PMIC_NLED_ISINK0,{0}},
 	{"green",             MT65XX_LED_MODE_PMIC, MT65XX_LED_PMIC_NLED_ISINK1,{0}},
 	{"blue",              MT65XX_LED_MODE_PMIC, MT65XX_LED_PMIC_NLED_ISINK2,{0}},
-// custom additions end here
 	{"jogball-backlight", MT65XX_LED_MODE_NONE, -1,{0}},
 	{"keyboard-backlight",MT65XX_LED_MODE_NONE, -1,{0}},
 	{"button-backlight",  MT65XX_LED_MODE_NONE, -1,{0}},
-
 	//lenovo wangyq13 modify begin
 	{"lcd-backlight",     MT65XX_LED_MODE_CUST_LCM, (long)mtkfb_set_backlight_level,{0}},
 	//lenovo wangyq13 modify end
-
 };
 
 struct cust_mt65xx_led *get_cust_led_list(void)
 {
 	return cust_led_list;
 }
-
+lig

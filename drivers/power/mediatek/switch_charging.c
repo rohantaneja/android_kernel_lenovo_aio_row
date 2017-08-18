@@ -30,7 +30,7 @@
  *------------------------------------------------------------------------------
  * Upper this line, this part is controlled by PVCS VM. DO NOT MODIFY!!
  *============================================================================
- ****************************************************************************/
+*/
 #include <linux/kernel.h>
 #include <mach/battery_common.h>
 #include <mach/charging.h>
@@ -55,6 +55,7 @@
 #ifdef CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT
 #include <mach/diso.h>
 #endif
+#include "fastchg.h"
 
  /* ============================================================ // */
  /* define */
@@ -667,7 +668,12 @@ void select_charging_curret(void)
 			g_temp_input_CC_value = CHARGE_CURRENT_500_00_MA;
 		} else {
 			g_temp_input_CC_value = CHARGE_CURRENT_MAX;
-			g_temp_CC_value = AC_CHARGER_CURRENT;
+			if(qc_enable)
+			    g_temp_CC_value = ac_level;
+			else
+			    g_temp_CC_value = AC_CHARGE_LEVEL_DEFAULT;			
+
+			//g_temp_CC_value = AC_CHARGER_CURRENT;
 
 			battery_log(BAT_LOG_CRTI, "[BATTERY] set_ac_current \r\n");
 		}
@@ -692,8 +698,15 @@ void select_charging_curret(void)
 			}
 #else
 			{
-				g_temp_input_CC_value = USB_CHARGER_CURRENT;
-				g_temp_CC_value = USB_CHARGER_CURRENT;
+				//g_temp_input_CC_value = USB_CHARGER_CURRENT;
+				//g_temp_CC_value = USB_CHARGER_CURRENT;
+			    if(qc_enable) {
+			    	g_temp_input_CC_value = usb_level;
+			    	g_temp_CC_value = usb_level;
+			    } else {
+			    	g_temp_input_CC_value = USB_CHARGE_LEVEL_DEFAULT;
+			    	g_temp_CC_value = USB_CHARGE_LEVEL_DEFAULT;
+			    }
 			}
 #endif
 		} else if (BMT_status.charger_type == NONSTANDARD_CHARGER) {
@@ -702,12 +715,19 @@ void select_charging_curret(void)
 
 		} else if (BMT_status.charger_type == STANDARD_CHARGER) {
 	/* Lenovo sw chailu1 add, charger ic hw decide input current  20150226 */			
-#if defined(AC_CHARGER_INPUT_CURRENT_MAX_SUPPORT)	
-                     g_temp_input_CC_value = AC_CHARGER_INPUT_CURRENT_MAX;
-#else
-			g_temp_input_CC_value = AC_CHARGER_CURRENT;
-#endif
-			g_temp_CC_value = AC_CHARGER_CURRENT;
+//#if defined(AC_CHARGER_INPUT_CURRENT_MAX_SUPPORT)	
+  //                   g_temp_input_CC_value = AC_CHARGER_INPUT_CURRENT_MAX;
+//#else
+//			g_temp_input_CC_value = AC_CHARGER_CURRENT;
+//#endif
+//			g_temp_CC_value = AC_CHARGER_CURRENT;
+			if(qc_enable) {
+			    g_temp_input_CC_value = ac_level;
+			    g_temp_CC_value = ac_level;
+			} else {
+			    g_temp_input_CC_value = AC_CHARGE_LEVEL_DEFAULT;
+			    g_temp_CC_value = AC_CHARGE_LEVEL_DEFAULT;
+			}
 #if defined(CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT)
         		if(is_ta_connect == KAL_TRUE)
         			set_ta_charging_current();
@@ -732,11 +752,19 @@ void select_charging_curret(void)
 
 		#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
 		if (DISO_data.diso_state.cur_vdc_state == DISO_ONLINE) {
-			g_temp_input_CC_value = AC_CHARGER_CURRENT;
-			g_temp_CC_value = AC_CHARGER_CURRENT;
+			if(qc_enable) {
+			    g_temp_input_CC_value = ac_level;
+			    g_temp_CC_value = ac_level;
+			} else {
+			    g_temp_input_CC_value = AC_CHARGE_LEVEL_DEFAULT;
+			    g_temp_CC_value = AC_CHARGE_LEVEL_DEFAULT;
+			}
+
+			//g_temp_input_CC_value = AC_CHARGER_CURRENT;
+			//g_temp_CC_value = AC_CHARGER_CURRENT;
 		}
 		#endif
-
+		printk("Fast-Charge (Using charge rate %d mA\n", g_temp_input_CC_value / 100);
 #if defined(CONFIG_MTK_JEITA_STANDARD_SUPPORT)
 		set_jeita_charging_current();
 #endif
@@ -802,20 +830,31 @@ static void pchr_turn_on_charging(void)
 
 		/* Set Charging Current */
 		if (get_usb_current_unlimited()) {
-			g_temp_input_CC_value = AC_CHARGER_CURRENT;
-			g_temp_CC_value = AC_CHARGER_CURRENT;
-			battery_log(BAT_LOG_FULL,
-					    "USB_CURRENT_UNLIMITED, use AC_CHARGER_CURRENT\n");
+			//g_temp_input_CC_value = AC_CHARGER_CURRENT;
+			//g_temp_CC_value = AC_CHARGER_CURRENT;
+			g_temp_input_CC_value = USB_CHARGE_LEVEL_MAX;//AC_CHARGER_CURRENT;
+			g_temp_CC_value = USB_CHARGE_LEVEL_MAX;//AC_CHARGER_CURRENT;
+			//battery_log(BAT_LOG_FULL,
+					   // "USB_CURRENT_UNLIMITED, use AC_CHARGER_CURRENT\n");
+			battery_log(BAT_LOG_CRTI,
+					    "USB_CURRENT_UNLIMITED, use USB_CHARGE_LEVEL_MAX\n");
 		} else if (g_bcct_flag == 1) {
 			select_charging_curret_bcct();
 
-			battery_log(BAT_LOG_FULL,
-					    "[BATTERY] select_charging_curret_bcct !\n");
+			//battery_log(BAT_LOG_FULL,
+					   // "[BATTERY] select_charging_curret_bcct !\n");
+			battery_log(BAT_LOG_CRTI,
+					    "[BATTERY] select_charging_curret_bcct !\n");		
 		} else {
 			select_charging_curret();
 
 			battery_log(BAT_LOG_FULL, "[BATTERY] select_charging_curret !\n");
 		}
+		battery_log(BAT_LOG_CRTI,
+				    "[BATTERY] Default CC mode charging : %d, input current = %d\r\n",
+				    g_temp_CC_value, g_temp_input_CC_value);
+
+		printk("Fast-Charge: Using charge rate %d mA\n", g_temp_input_CC_value);
 #ifdef CONFIG_LENOVO_THERMAL_SUPPORT
 	if (g_bcct_flag == 1)
 	{

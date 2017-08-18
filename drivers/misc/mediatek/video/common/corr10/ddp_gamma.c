@@ -141,17 +141,18 @@ static int disp_gamma_set_lut(const DISP_GAMMA_LUT_T __user *user_gamma_lut, voi
 
 	gamma_lut = kmalloc(sizeof(DISP_GAMMA_LUT_T), GFP_KERNEL);
 	if (gamma_lut == NULL) {
-        printk(KERN_ERR "[GAMMA] disp_gamma_set_lut: cannot copy from user mem\n");
+		GAMMA_ERR("disp_gamma_set_lut: no memory\n");
 		return -EFAULT;
 	}
 
 #ifdef CONFIG_MTK_VIDEOX_CYNGN_LIVEDISPLAY
-    if (virt_addr_valid(user_gamma_lut)) {
-        memcpy(gamma_lut, user_gamma_lut, sizeof(DISP_GAMMA_LUT_T));
-    } else
+	if (virt_addr_valid(user_gamma_lut)) {
+		memcpy(gamma_lut, user_gamma_lut, sizeof(DISP_GAMMA_LUT_T));
+	} else
 #endif
+
 	if (copy_from_user(gamma_lut, user_gamma_lut, sizeof(DISP_GAMMA_LUT_T)) != 0) {
-		GAMMA_ERR("disp_gamma_set_lut: cannot copy from user mem");
+        printk(KERN_ERR "[GAMMA] disp_gamma_set_lut: cannot copy from user mem\n");
 		ret = -EFAULT;
 		kfree(gamma_lut);
 	}

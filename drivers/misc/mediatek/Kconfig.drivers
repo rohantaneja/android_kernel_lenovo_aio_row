@@ -189,7 +189,7 @@ config MTK_DITHERING_SUPPORT
 
 config MTK_VIDEOX_CYNGN_LIVEDISPLAY
 	bool CONFIG_MTK_VIDEOX_CYNGN_LIVEDISPLAY
-	default n
+	default y
 	help
 		Enable the RGB interface for color calibration.
 

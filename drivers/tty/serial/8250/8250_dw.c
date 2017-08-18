@@ -112,29 +112,15 @@ static unsigned int dw8250_serial_in(struct uart_port *p, int offset)
 	return dw8250_modify_msr(p, offset, value);
 }
 
+static void dw8250_serial_out32(struct uart_port *p, int offset, int value)
 {
 	struct dw8250_data *d = p->private_data;
 
-	if (offset == UART_MCR)
-		d->last_mcr = value;
+	if (offset == UART_LCR)
+		d->last_lcr = value;
 
-	writel(value, p->membase + (offset << p->regshift));
-
-	/* Make sure LCR write wasn't ignored */
-	if (offset == UART_LCR) {
-		int tries = 1000;
-		while (tries--) {
-			unsigned int lcr = p->serial_in(p, UART_LCR);
-			if ((value & ~UART_LCR_SPAR) == (lcr & ~UART_LCR_SPAR))
-				return;
-			dw8250_force_idle(p);
-			writel(value, p->membase + (UART_LCR << p->regshift));
-		}
-		/*
-		 * FIXME: this deadlocks if port->lock is already held
-		 * dev_err(p->dev, "Couldn't set LCR to %d\n", value);
-		 */
-	}
+	offset <<= p->regshift;
+	writel(value, p->membase + offset);
 }
 
 static unsigned int dw8250_serial_in32(struct uart_port *p, int offset)

@@ -591,10 +591,10 @@ config TELCLOCK
 	  /sys/devices/platform/telco_clock, with a number of files for
 	  controlling the behavior of this hardware.
 
-config DEVPORT
+ config DEVPORT
 	bool "/dev/port character device"
-	depends on ISA || PCI
-	default y
+ 	depends on ISA || PCI
+ 	default y
 	help
 	  Say Y here if you want to support the /dev/port device. The /dev/port
 	  device is similar to /dev/mem, but for I/O ports.
