@@ -434,7 +434,7 @@ static void ke_gen_userbacktrace_msg(void)
 	LOGD("len(pid+int):%lx\n", (long)(sizeof(pid_t)+sizeof(int)));
 	LOGD("des :%lx\n", (long)(data+ sizeof(pid_t)+sizeof(int)));
 	LOGD("src addr :%lx\n", (long)((char *)(aed_dev.kerec.lastlog->userthread_stack.Userthread_Stack)));
-	
+
 	memcpy( (data+ sizeof(pid_t)+sizeof(int)), (char *)(aed_dev.kerec.lastlog->userthread_stack.Userthread_Stack),aed_dev.kerec.lastlog->userthread_stack.StackLength);//copy userthread_stack :8k
 
 	#if 0 //for debug
@@ -442,8 +442,8 @@ static void ke_gen_userbacktrace_msg(void)
 		int i=0;
 		for (i=0;i<64;i++)
 				LOGD("%x\n ", data[i]);
-		
-	}	
+
+	}
 	#endif
 	LOGD("%s  +++ \n", __func__);
 }
@@ -469,7 +469,7 @@ static void ke_gen_usermaps_msg(void)
 	LOGD("len(pid+int):%lx\n", (long)(sizeof(pid_t)+sizeof(int)));
 	LOGD("des :%lx\n", (long)(data+ sizeof(pid_t)+sizeof(int)));
 	LOGD("src addr :%lx\n", (long)((char *)(aed_dev.kerec.lastlog->userthread_maps.Userthread_maps)));
-	
+
 	memcpy( (data+ sizeof(pid_t)+sizeof(int)), (char *)(aed_dev.kerec.lastlog->userthread_maps.Userthread_maps),aed_dev.kerec.lastlog->userthread_maps.Userthread_mapsLength);//copy userthread_stack :8k
 
 	LOGD("%s  +++ \n", __func__);
@@ -491,7 +491,7 @@ static void ke_gen_user_reg_msg(void)
 	data = (char *)rep_msg + sizeof(AE_Msg);
 	rep_msg->cmdType = AE_RSP;
 	rep_msg->cmdId = AE_REQ_USER_REG;
-	
+
 	/* Count into the NUL byte at end of string */
 	rep_msg->len =sizeof(struct aee_thread_reg );
 	memcpy(data, (char *) &(aed_dev.kerec.lastlog->userthread_reg), sizeof(struct aee_thread_reg ));
@@ -499,11 +499,11 @@ static void ke_gen_user_reg_msg(void)
 	#ifdef __aarch64__ //64bit kernel+32 u
 	if (is_compat_task())//K64_U32
 	{
-		
-		LOGE(" K64+ U32 pc/lr/sp 0x%16lx/0x%16lx/0x%16lx\n", (long)(aed_dev.kerec.lastlog->userthread_reg.regs.user_regs.pc), 
+
+		LOGE(" K64+ U32 pc/lr/sp 0x%16lx/0x%16lx/0x%16lx\n", (long)(aed_dev.kerec.lastlog->userthread_reg.regs.user_regs.pc),
 			(long)(aed_dev.kerec.lastlog->userthread_reg.regs.regs[14]),
 				 (long)(aed_dev.kerec.lastlog->userthread_reg.regs.regs[13]) );
-	}	
+	}
 	#endif
 	#endif
 	LOGD("%s +++ \n", __func__);
@@ -986,7 +986,7 @@ static ssize_t aed_ee_write(struct file *filp, const char __user *buf, size_t co
 
 	if (!eerec)
 		return -1;
-		
+
 	msg_destroy(&eerec->msg);
 
 	/* the request must be an *AE_Msg buffer */
@@ -1448,12 +1448,12 @@ static long aed_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			{
 				LOGD("%s: AEEIOCTL_USER_IOCTL_TO_KERNEL_WANING,call kthread create ,is ok\n", __func__);
 				//kthread_create(Dstate_test, NULL, "D-state");
-				
+
 				aee_kernel_warning_api(__FILE__, __LINE__, DB_OPT_DEFAULT|DB_OPT_NATIVE_BACKTRACE, "AEEIOCTL_USER_IOCTL_TO_KERNEL_WANING",
 						   "Trigger Kernel warning");
 				break;
 			}
-	
+
 	case AEEIOCTL_CHECK_SUID_DUMPABLE:
 		{
 			int pid;
@@ -1542,12 +1542,12 @@ void Log2Buffer(struct aee_oops *oops,const char *fmt, ...)
 
 	va_start(ap, fmt);
 	len = strlen(oops->userthread_maps.Userthread_maps);
-	
+
 	if ((len + sizeof(buf)) < MaxMapsSize)
 	{
 				vsnprintf(&oops->userthread_maps.Userthread_maps[len], sizeof(buf), fmt, ap);
 				oops->userthread_maps.Userthread_mapsLength=len + sizeof(buf);
-	}			
+	}
 	va_end(ap);
 }
 
@@ -1570,16 +1570,16 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 	oops->userthread_reg.tid=current_task->tgid; //process ID
 	oops->userthread_stack.tid=current_task->tgid; //process ID
 	oops->userthread_maps.tid=current_task->tgid; //process ID
-	
+
 	memcpy(&oops->userthread_reg.regs, user_ret, sizeof(struct pt_regs));
 	LOGE(" pid:%d /// tgid:%d, stack:0x%08lx\n", current_task->pid, current_task->tgid,(long)oops->userthread_stack.Userthread_Stack);
 	if (!user_mode(user_ret))
 		return 0;
-	
+
 	if (current_task->mm == NULL)
 		return 0;
 
-	
+
 
 	#if 1
 	vma = current_task->mm->mmap;
@@ -1587,7 +1587,7 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 		file = vma->vm_file;
 		flags = vma->vm_flags;
 		if (file) {
-			
+
 			LOGE("%08lx-%08lx %c%c%c%c    %s\n", vma->vm_start, vma->vm_end,
 			     flags & VM_READ ? 'r' : '-',
 			     flags & VM_WRITE ? 'w' : '-',
@@ -1622,13 +1622,13 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 				     flags & VM_WRITE ? 'w' : '-',
 				     flags & VM_EXEC ? 'x' : '-',
 				     flags & VM_MAYSHARE ? 's' : 'p', name);
-				
+
    Log2Buffer(oops,"%08lx-%08lx %c%c%c%c    %s\n", vma->vm_start, vma->vm_end,
          flags & VM_READ ? 'r' : '-',
          flags & VM_WRITE ? 'w' : '-',
          flags & VM_EXEC ? 'x' : '-',
          flags & VM_MAYSHARE ? 's' : 'p', name);
-   
+
 
 			}
 		}
@@ -1637,14 +1637,14 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 
 	}
 	#endif
-	
+
 	LOGE("maps addr(0x%08lx), maps len:%d\n", (long)oops->userthread_maps.Userthread_maps, oops->userthread_maps.Userthread_mapsLength);
 
 #ifndef __aarch64__ //32bit
 	LOGE(" pc/lr/sp 0x%08lx/0x%08lx/0x%08lx\n", user_ret->ARM_pc, user_ret->ARM_lr,
 			 user_ret->ARM_sp);
 		userstack_start = (unsigned long)user_ret->ARM_sp;
-	
+
 	vma = current_task->mm->mmap;
 	while (vma != NULL) {
 		if (vma->vm_start <= userstack_start && vma->vm_end >= userstack_start) {
@@ -1665,7 +1665,7 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 		     (MaxStackSize-1)) ? (userstack_end - userstack_start) : (MaxStackSize-1);
 	oops->userthread_stack.StackLength=length;
 
-	
+
 	ret = copy_from_user((void *)(oops->userthread_stack.Userthread_Stack), (const void __user *)(userstack_start), length);
 	LOGE("u+k 32 copy_from_user ret(0x%08x),len:%lx\n", ret, length);
 	LOGE("end dump native stack:\n");
@@ -1673,7 +1673,7 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 
 	if (is_compat_task())//K64_U32
 	{
-		
+
 		LOGE(" K64+ U32 pc/lr/sp 0x%16lx/0x%16lx/0x%16lx\n", (long)(user_ret->user_regs.pc), (long)(user_ret->user_regs.regs[14]),
 				 (long)(user_ret->user_regs.regs[13]) );
 		userstack_start = (unsigned long)user_ret->user_regs.regs[13];
@@ -1705,7 +1705,7 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
          (long)(user_ret->user_regs.sp) );
   userstack_start = (unsigned long)user_ret->user_regs.sp;
 		vma = current_task->mm->mmap;
-		while (vma != NULL) 
+		while (vma != NULL)
 		{
 			if (vma->vm_start <= userstack_start && vma->vm_end >= userstack_start) {
 				userstack_end = vma->vm_end;
@@ -1720,15 +1720,15 @@ int DumpThreadNativeInfo(struct aee_oops *oops)
 			LOGE("Dump native stack failed:\n");
 			return 0;
 		}
-	
+
 		LOGE("Dump stack range (0x%16lx:0x%16lx)\n", userstack_start, userstack_end);
 		length =((userstack_end - userstack_start) <
 		     (MaxStackSize-1)) ? (userstack_end - userstack_start) : (MaxStackSize-1);
 		oops->userthread_stack.StackLength=length;
 		ret = copy_from_user((void *)(oops->userthread_stack.Userthread_Stack), (const void __user *)(userstack_start), length);
 		LOGE("copy_from_user ret(0x%08x),len:%lx\n", ret, length);
-	}	
-	
+	}
+
 #endif
 	return 0;
 }
@@ -1755,13 +1755,13 @@ static void kernel_reportAPI(const AE_DEFECT_ATTR attr, const int db_opt, const 
 		if(db_opt & DB_OPT_NATIVE_BACKTRACE)
 		{
 			oops->userthread_stack.Userthread_Stack= vzalloc(MaxStackSize);
-			if (oops->userthread_stack.Userthread_Stack == NULL) 
+			if (oops->userthread_stack.Userthread_Stack == NULL)
 			{
 				LOGE("%s: oops->userthread_stack.Userthread_Stack Vmalloc fail", __func__);
 				return;
 			}
 			oops->userthread_maps.Userthread_maps= vzalloc(MaxMapsSize);
-			if (oops->userthread_maps.Userthread_maps == NULL) 
+			if (oops->userthread_maps.Userthread_maps == NULL)
 			{
 				LOGE("%s: oops->userthread_maps.Userthread_maps Vmalloc fail", __func__);
 				return;
@@ -1770,7 +1770,7 @@ static void kernel_reportAPI(const AE_DEFECT_ATTR attr, const int db_opt, const 
 			oops->userthread_stack.StackLength=MaxStackSize;  //default 8k
 			oops->userthread_maps.Userthread_mapsLength=MaxMapsSize;  //default 8k
 			DumpThreadNativeInfo(oops);
-			
+
 		}
 		LOGI("%s,%s,%s,0x%x\n", __func__, module, msg, db_opt);
 		ke_queue_request(oops);
@@ -1785,7 +1785,7 @@ void aee_kernel_dal_api(const char *file, const int line, const char *msg)
 		LOGE("aee_kernel_dal_api: in interrupt context, skip");
 		return;
 	}
-	
+
 #if defined(CONFIG_MTK_AEE_AED) && defined(CONFIG_MTK_FB)
 	if (down_interruptible(&aed_dal_sem) < 0) {
 		LOGI("ERROR : aee_kernel_dal_api() get aed_dal_sem fail ");
@@ -1810,10 +1810,10 @@ void aee_kernel_dal_api(const char *file, const int line, const char *msg)
 			strncpy(dal_show->msg, msg, sizeof(dal_show->msg) - 1);
 			dal_show->msg[sizeof(dal_show->msg) - 1] = 0;
 			DAL_Printf("%s", dal_show->msg);
-			kfree(dal_show);
 		} else {
 			LOGD("DAL not allowed (mode %d)\n", aee_mode);
 		}
+		kfree(dal_show);
 	}
 	up(&aed_dal_sem);
 #endif
