@@ -341,7 +341,7 @@ extern void wlanUnregisterNotifier(void);
 extern void register_set_p2p_mode_handler(set_p2p_mode handler);
 extern void register_set_dbg_level_handler(set_dbg_level handler);
 
-#if CFG_TC1_FEATURE
+#if CFG_TC1_FEATURE || defined(CONFIG_MTK_COMBO_AOSP_TETHERING_SUPPORT)
 #define NIC_INF_NAME_IN_AP_MODE  "legacy%d"
 extern volatile int wlan_if_changed;
 #endif
