@@ -148,6 +148,55 @@ config CPU_FREQ_DEFAULT_GOV_HOTPLUG
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the performance governor.
 
+config CPU_FREQ_DEFAULT_GOV_INTERACTIVEB
+	bool "interactiveb"
+	select CPU_FREQ_GOV_INTERACTIVEB
+	help
+	  Use the CPUFreq governor 'interactiveb' as default. This allows
+          you to get a full dynamic cpu frequency capable system by simply
+          loading your cpufreq low-level hardware driver, using the
+	  'interactiveb' governor for latency-sensitive workloads.
+
+config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
+        bool "pegasusq"
+        select CPU_FREQ_GOV_PEGASUSQ
+        help
+          Use the CPUFreq governor 'pegasusq' as default
+
+config CPU_FREQ_DEFAULT_GOV_ALUCARD
+	bool "alucard"
+	select CPU_FREQ_GOV_ALUCARD
+	help
+
+config CPU_FREQ_DEFAULT_GOV_WHEATLEY
+	bool "wheatley"
+	select CPU_FREQ_GOV_WHEATLEY
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'wheatley' as default.
+
+config CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
+        bool "intellidemand"
+        select CPU_FREQ_GOV_INTELLIDEMAND
+        help
+          Use the CPUFreq governor 'intellidemand' as default. This is
+          based on Ondemand with browsing detection based on GPU loading.
+
+config CPU_FREQ_DEFAULT_GOV_THUNDERX
+  bool "thunderx"
+  select CPU_FREQ_GOV_THUNDERX
+  help
+
+config CPU_FREQ_DEFAULT_GOV_DARKNESS
+	bool "darkness"
+        select CPU_FREQ_GOV_DARKNESS
+
+config CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE
+	bool "intelliactive"
+	select CPU_FREQ_GOV_INTELLIACTIVE
+	help
+	  Use the CPUFreq governor 'intelliactive' as default.
+
 endchoice
 
 config CPU_FREQ_GOV_BALANCE
@@ -302,6 +351,90 @@ config CPU_FREQ_GOV_HOTPLUG
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+
+config CPU_FREQ_GOV_INTERACTIVEB
+	tristate "'interactiveb' cpufreq policy governor"
+
+config CPU_FREQ_GOV_ALUCARD
+	tristate "'alucard' cpufreq governor"
+	depends on CPU_FREQ
+	help
+          For details, take a look at linux/Documentation/cpu-freq.
+
+          If in doubt, say N.
+
+config CPU_FREQ_GOV_WHEATLEY
+	tristate "'wheatley' cpufreq governor"
+	depends on CPU_FREQ
+	help
+          'cpufreq_wheatley' - A dynamic cpufreq governor for 
+          Low Latency Frequency Transition capable processors
+
+          For details, take a look at linux/Documentation/cpu-freq.
+
+          If in doubt, say N.
+
+config CPU_FREQ_GOV_PEGASUSQ
+	tristate "'pegasusq' cpufreq policy governor"
+
+config CPU_FREQ_GOV_INTELLIDEMAND
+        tristate "'intellidemand' cpufreq policy governor"
+        select CPU_FREQ_TABLE
+        help
+          'intellidemand' - This driver adds a dynamic cpufreq policy governor.
+          The governor does a periodic polling and
+          changes frequency based on the CPU utilization.
+          The support for this governor depends on CPU capability to
+          do fast frequency switching (i.e, very low latency frequency
+          transitions). with browsing detection based on GPU loading
+
+          To compile this driver as a module, choose M here: the
+          module will be called cpufreq_ondemand.
+
+          For details, take a look at linux/Documentation/cpu-freq.
+     
+          If in doubt, say N.
+
+config CPU_FREQ_GOV_THUNDERX
+        tristate "'thunderx' cpufreq governor"
+        depends on CPU_FREQ
+        default y
+        help
+          'thunderx' - a "power optimized" governor for Mediatek SoCs
+
+config CPU_FREQ_GOV_DARKNESS
+	tristate "'darkness' cpufreq policy governor"
+	depends on CPU_FREQ
+
+config CPU_FREQ_GOV_INTELLIACTIVE
+	tristate "'intelliactive' cpufreq policy governor"
+	help
+	  'intelliactive' - This driver adds a dynamic cpufreq policy governor
+
+config CPU_FREQ_GOV_ELEMENTALX
+ 	tristate "'elementalx' cpufreq policy governor"
+ 	select CPU_FREQ_TABLE
+ 	help
+ 	  'elementalx' - This driver adds a dynamic cpufreq policy governor.
+ 
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called cpufreq_elementalx.
+ 
+ 	  For details, take a look at linux/Documentation/cpu-freq.
+ 
+ 	  If in doubt, say N.
+
+config CPU_FREQ_GOV_SMARTMAX_EPS
+        tristate "'smartmax EPS' cpufreq policy governor"
+        select CPU_FREQ_TABLE
+        help
+          'smartmax EPS' is the extreme powersaving version of smartmax
+
+config THUNDERQUAKE_ENGINE_GPL
+   tristate "Vibrator Intensity Controller for MTK Vibrator"
+   default y
+   help
+   Vibrator Intensity Controller for MTK Vibrator v1.0
 
 config GENERIC_CPUFREQ_CPU0
 	tristate "Generic CPU0 cpufreq driver"
