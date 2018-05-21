@@ -536,6 +536,12 @@ config SRAM
 	  This driver allows you to declare a memory region to be managed by
 	  the genalloc API. It is supposed to be used for small on-chip SRAM
 	  areas found on many SoCs.
+	  
+config THUNDERQUAKE_ENGINE_GPL
+   tristate "Vibrator Intensity Controller for MTK Vibrator"
+   default y
+   help
+   Vibrator Intensity Controller for MTK Vibrator v1.0	  
 
 config UID_CPUTIME
 	tristate "Per-UID cpu time statistics"
