@@ -34,6 +34,11 @@ modules.builtin
 *.gcno
 
 #
+#Ignore the anykernel image copy
+#
+AnyKernel2/Image.gz-dtb
+
+#
 # Top-level generic files
 #
 /tags
