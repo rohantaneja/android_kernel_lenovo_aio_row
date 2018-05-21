@@ -1,0 +1,135 @@
+#!/sbin/sh
+# AnyKernel2 Backend
+# osm0sis @ xda-developers
+
+OUTFD=/proc/self/fd/$2;
+ZIPFILE="$3";
+DIR=`dirname "$ZIPFILE"`;
+
+ui_print() {
+  until [ ! "$1" ]; do
+    echo -e "ui_print $1\nui_print" > $OUTFD;
+    shift;
+  done;
+}
+show_progress() { echo "progress $1 $2" > $OUTFD; }
+file_getprop() { grep "^$2=" "$1" | cut -d= -f2; }
+if [ ! "$(getprop 2>/dev/null)" ]; then
+  getprop() {
+    local propval="$(file_getprop /default.prop $1 2>/dev/null)";
+    test "$propval" || local propval="$(file_getprop /system/build.prop $1 2>/dev/null)";
+    test "$propval" && echo "$propval" || echo "";
+  }
+fi;
+cleanup() { rm -rf /tmp/anykernel; }
+debugging() {
+  case $(basename "$ZIPFILE" .zip) in
+    *-debugging)
+      ui_print " ";
+      ui_print "Creating debugging archive in zip directory...";
+      $bb tar -czvf "$DIR/anykernel2-$(date +%Y-%m-%d_%H%M%S)-debug.tgz" /tmp/*;
+    ;;
+  esac;
+}
+abort() {
+  ui_print "$*";
+  debugging;
+  if [ ! -f /tmp/anykernel/anykernel.sh -o "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanuponabort 2>/dev/null)" == 1 ]; then
+    cleanup;
+  fi;
+  umount /system;
+  exit 1;
+}
+
+show_progress 1.34 13;
+ui_print " ";
+cleanup;
+mkdir -p /tmp/anykernel/bin;
+cd /tmp/anykernel;
+unzip -o "$ZIPFILE";
+if [ $? != 0 -o -z "$(ls /tmp/anykernel/tools)" ]; then
+  abort "** Unzip failed! Aborting! **";
+fi;
+bb=/tmp/anykernel/tools/busybox;
+chmod 755 $bb;
+$bb chmod -R 755 /tmp/anykernel/tools /tmp/anykernel/bin;
+
+if [ -f /tmp/anykernel/banner ]; then
+  while IFS='' read -r line || $bb [[ -n "$line" ]]; do
+    ui_print "$line";
+  done < /tmp/anykernel/banner;
+  ui_print " ";
+  ui_print " ";
+fi;
+
+ui_print "$(file_getprop /tmp/anykernel/anykernel.sh kernel.string)";
+if [ -f /tmp/anykernel/version ]; then
+  ui_print " ";
+  ui_print "$(cat /tmp/anykernel/version)";
+fi;
+ui_print " ";
+ui_print " ";
+
+umount /system 2>/dev/null;
+mount -o rw -t auto /system;
+test -f /system/system/build.prop && root=/system;
+
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
+  ui_print "- Checking device";
+  for i in 1 2 3 4 5; do
+    testname="$(file_getprop /tmp/anykernel/anykernel.sh device.name$i)";
+    if [ "$(getprop ro.product.device)" == "$testname" -o "$(getprop ro.build.product)" == "$testname" ]; then
+      ui_print "  - Device : $testname";
+      match=1;
+    fi;
+  done;
+  if [ "$match" != 1 ]; then
+    ui_print "**   Unsupported device! Aborting!   **";
+	abort "** Make sure you have the right twrp **";
+  fi;
+fi;
+
+ui_print " ";
+ui_print "- Checking Android version";
+
+SDK=$(file_getprop /system/build.prop ro.build.version.sdk);
+if [ "$SDK" -lt 26 ]; then
+abort "** Unsupported Android version **";
+fi;
+if [ "$SDK" -gt 27 ]; then
+abort "** Unsupported Android version **";
+fi;
+ui_print "  - Android level $SDK";
+ui_print " ";
+ui_print "- Installing kernel";
+ui_print "  - Setting up busybox";
+for i in $($bb --list); do
+  $bb ln -s $bb /tmp/anykernel/bin/$i;
+done;
+if [ $? != 0 -o -z "$(ls /tmp/anykernel/bin)" ]; then
+  abort "  - Recovery busybox setup failed! Aborting!";
+fi;
+ui_print "  - Busybox setup successful";
+ui_print "  - Mode : Normal";
+PATH="/tmp/anykernel/bin:$PATH" $bb ash /tmp/anykernel/anykernel.sh $2;
+if [ $? != "0" ]; then
+  abort;
+fi;
+ui_print " ";
+
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.system)" == 1 ]; then
+  ui_print "- Pushing System files";  
+  cp -fr /tmp/anykernel/system/* /system/;
+  set_perm 0 0 0777 SYSTEM:etc/init.d/init_ksm;
+  ui_print "  - System files done";  
+fi;
+ui_print " ";
+ui_print "- Cleaning directories";
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanup)" == 1 ]; then
+  cleanup;
+fi;
+ui_print "- Unmounting system";
+umount /system;
+ui_print " ";
+ui_print "- Venom successfully installed!";
+ui_print " ";

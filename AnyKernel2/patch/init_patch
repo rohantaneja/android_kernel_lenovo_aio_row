@@ -1,0 +1,8 @@
+# init.d support
+service sysinit /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d
+user root
+disabled
+oneshot
+
+on property:sys.init.d=on
+start sysinit
