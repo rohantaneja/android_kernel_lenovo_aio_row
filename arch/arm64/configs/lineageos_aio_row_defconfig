@@ -51,6 +51,9 @@ CONFIG_CGROUP_ZENIO=y
 #Thunderquake
 CONFIG_THUNDERQUAKE_ENGINE_GPL=y
 
+# That random boi
+CONFIG_FRANDOM=y
+
 #
 #Venom additions - end
 #
