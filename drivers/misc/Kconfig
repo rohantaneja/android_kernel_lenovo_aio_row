@@ -550,6 +550,14 @@ config UID_CPUTIME
 	  Per UID based cpu time statistics exported to /proc/uid_cputime
 	  this config include in kernel 3.18
 	  add this patch for kernel 3.10
+	  
+config POCKETMOD
+ 	bool "PocketMod for device wake modifications"
+ 	default y
+ 	help
+ 		Say Y here to enable PocketMod. Users can always
+ 		toggle this on/off from sysfs later (should they
+ 		want it)  	  
 
 config TI_TCA6418
     default n
