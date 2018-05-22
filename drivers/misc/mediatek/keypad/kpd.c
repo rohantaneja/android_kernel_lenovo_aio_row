@@ -26,8 +26,8 @@
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 #include <linux/input/sweep2wake.h>
 #endif
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-#include <linux/input/doubletap2wake.h>
+#ifdef CONFIG_TOUCHSCREEN_TRACE2SLEEP
+#include <linux/input/trace2wake.h>
 #endif
 #endif
 
@@ -878,9 +878,9 @@ static int kpd_pdrv_probe(struct platform_device *pdev)
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	sweep2wake_setdev(kpd_input_dev);
 #endif
-/*#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	doubletap2wake_setdev(kpd_input_dev);
-#endif*/
+#ifdef CONFIG_TOUCHSCREEN_TRACE2SLEEP
+	trace2wake_setdev(kpd_input_dev);
+#endif
 #endif
 
 #ifdef KPD_KEY_MAP
