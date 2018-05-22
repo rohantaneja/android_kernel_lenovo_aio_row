@@ -427,7 +427,7 @@ static ssize_t t2w_trace2wake_dump(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(trace2wake, (S_IWUSR|S_IRUGO),
+static DEVICE_ATTR(trace2sleep, (S_IWUSR|S_IRUGO),
 	t2w_trace2wake_show, t2w_trace2wake_dump);
 
 static ssize_t t2w_version_show(struct device *dev,
@@ -446,7 +446,7 @@ static ssize_t t2w_version_dump(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(trace2wake_version, (S_IWUSR|S_IRUGO),
+static DEVICE_ATTR(trace2sleep_version, (S_IWUSR|S_IRUGO),
 	t2w_version_show, t2w_version_dump);
 
 /*
