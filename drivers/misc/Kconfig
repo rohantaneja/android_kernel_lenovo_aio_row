@@ -536,6 +536,12 @@ config SRAM
 	  This driver allows you to declare a memory region to be managed by
 	  the genalloc API. It is supposed to be used for small on-chip SRAM
 	  areas found on many SoCs.
+	  
+config THUNDERQUAKE_ENGINE_GPL
+   tristate "Vibrator Intensity Controller for MTK Vibrator"
+   default y
+   help
+   Vibrator Intensity Controller for MTK Vibrator v1.0	  
 
 config UID_CPUTIME
 	tristate "Per-UID cpu time statistics"
@@ -544,6 +550,14 @@ config UID_CPUTIME
 	  Per UID based cpu time statistics exported to /proc/uid_cputime
 	  this config include in kernel 3.18
 	  add this patch for kernel 3.10
+	  
+config POCKETMOD
+ 	bool "PocketMod for device wake modifications"
+ 	default y
+ 	help
+ 		Say Y here to enable PocketMod. Users can always
+ 		toggle this on/off from sysfs later (should they
+ 		want it)  	  
 
 config TI_TCA6418
     default n
